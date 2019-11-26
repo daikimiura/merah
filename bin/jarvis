@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby
+
+require 'jarvis'
+
+java_class_file = ARGV[0]
+::Jarvis::Runner.new.run(java_class_file)
