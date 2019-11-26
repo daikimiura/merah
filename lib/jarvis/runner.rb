@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'jarvis/reader'
+require "jarvis/reader"
 
 module Jarvis
   class Runner

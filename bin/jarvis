@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
-require 'jarvis'
+require "jarvis"
 
 java_class_file = ARGV[0]
 ::Jarvis::Runner.new.run(java_class_file)
