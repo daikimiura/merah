@@ -1,23 +1,28 @@
 # frozen_string_literal: true
 
-require "constant_pool/class"
-require "constant_pool/methodref"
-require "constant_pool/name_and_type"
-require "constant_pool/string"
-require "constant_pool/utf8"
+require "jvm/class_file"
+require "jvm/constant_pool/class"
+require "jvm/constant_pool/methodref"
+require "jvm/constant_pool/name_and_type"
+require "jvm/constant_pool/string"
+require "jvm/constant_pool/utf8"
 require "pry"
 require "pry-byebug"
 
 module Jarvis
   class Reader
-    attr_accessor :file
+    attr_accessor :file, :class_file
 
     def initialize(file_name:)
       @file = File.open(file_name, "rb:ASCII-8BIT")
+      @class_file = ::Jvm::ClassFile.new
     end
 
     def read
-      file.seek(8, IO::SEEK_SET)
+      class_file.magic =  file.read(4)
+      class_file.minor_version = file.read(2).unpack("n").first
+      class_file.major_version = file.read(2).unpack("n").first
+      binding.pry
       read_constant_pool
     end
 
@@ -34,25 +39,25 @@ module Jarvis
             bytes = []
             length.times { bytes << file.read(1) }
 
-            constant_pool_items << ::ConstantPool::Utf8.new(
+            constant_pool_items << ::Jvm::ConstantPool::Utf8.new(
               length: length,
               bytes: bytes
             )
           when 7
             name_index = file.read(2).unpack("n").first
-            constant_pool_items << ::ConstantPool::Class.new(
+            constant_pool_items << ::Jvm::ConstantPool::Class.new(
               name_index: name_index
             )
           when 8
             string_index = file.read(2).unpack("n").first
-            constant_pool_items << ::ConstantPool::String.new(
+            constant_pool_items << ::Jvm::ConstantPool::String.new(
               string_index: string_index
             )
           when 10
             class_index = file.read(2).unpack("n").first
             name_and_type_inedx = file.read(2).unpack("n").first
 
-            constant_pool_items << ::ConstantPool::Methodref.new(
+            constant_pool_items << ::Jvm::ConstantPool::Methodref.new(
               class_index: class_index,
               name_and_type_index: name_and_type_inedx
             )
@@ -60,13 +65,14 @@ module Jarvis
             name_index = file.read(2).unpack("n").first
             descriptor_index = file.read(2).unpack("n").first
 
-            constant_pool_items << ::ConstantPool::NameAndType.new(
+            constant_pool_items << ::Jvm::ConstantPool::NameAndType.new(
               name_index: name_index,
               descriptor_index: descriptor_index
             )
           end
+          class_file.constant_pool_count = constant_pool_count
+          class_file.constant_pool_items = constant_pool_items
         end
-        binding.pry
       end
   end
 end
