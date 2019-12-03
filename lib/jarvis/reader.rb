@@ -13,6 +13,7 @@ require "jvm/attributes/code"
 require "jvm/attributes/exception_table_item"
 require "jvm/attributes/line_number_table"
 require "jvm/attributes/line_number_table_item"
+require "jvm/attributes/source_file"
 
 require "pry-byebug"
 
@@ -51,7 +52,6 @@ module Jarvis
         attribute = read_attribute
         class_file.attribute_info << attribute
       end
-      binding.pry
 
       class_file
     end
@@ -156,6 +156,8 @@ module Jarvis
           read_code_attribute(attribute_name_index, attribute_length)
         when "LineNumberTable"
           read_line_number_table_attribute(attribute_name_index, attribute_length)
+        when "SourceFile"
+          read_source_file_attribute(attribute_name_index, attribute_length)
         else
           raise AttributeNameNotSupported, "attribute_name: #{class_file.constant_pool_items[attribute_name_index - 1].bytes.join}"
         end
@@ -216,6 +218,15 @@ module Jarvis
           attribute_length: attribute_length,
           line_number_table_length: line_number_table_length,
           line_number_table: line_number_table
+        )
+      end
+
+      def read_source_file_attribute(attribute_name_index, attribute_length)
+        sourcefile_index = read_unsigned_short
+        ::Jvm::Attributes::SourceFile.new(
+          attribute_name_index: attribute_name_index,
+          attribute_length: attribute_length,
+          sourcefile_index: sourcefile_index
         )
       end
   end
