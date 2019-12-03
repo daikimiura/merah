@@ -10,7 +10,9 @@ require "jvm/constant_pool/name_and_type"
 require "jvm/constant_pool/string"
 require "jvm/constant_pool/utf8"
 require "jvm/attributes/code"
-require "jvm/attributes/exception_table"
+require "jvm/attributes/exception_table_item"
+require "jvm/attributes/line_number_table"
+require "jvm/attributes/line_number_table_item"
 
 require "pry-byebug"
 
@@ -42,7 +44,16 @@ module Jarvis
       class_file.interfaces_count = read_unsigned_short
       class_file.fields_count = read_unsigned_short
       read_methods
+
+      class_file.attributes_count = read_unsigned_short
+      class_file.attribute_info = []
+      class_file.attributes_count.times do
+        attribute = read_attribute
+        class_file.attribute_info << attribute
+      end
       binding.pry
+
+      class_file
     end
 
     private
@@ -156,12 +167,12 @@ module Jarvis
 
         code_length = read_unsigned_long
         code = []
-        code_length.times { code << file.read(1).unpack("C") }
+        code_length.times { code << file.read(1).unpack("C").first }
 
         exception_table_length = read_unsigned_short
         exception_table = []
         exception_table_length.times do
-          exception_table << ::Jvm::Attributes::ExceptionTable.new(
+          exception_table << ::Jvm::Attributes::ExceptionTableItem.new(
             start_pc: read_unsigned_short,
             end_pc: read_unsigned_short,
             handler_pc: read_unsigned_short,
@@ -190,7 +201,22 @@ module Jarvis
         )
       end
 
-      def read_line_number_table_attribute(attribute_name_index, attribute_length)e
+      def read_line_number_table_attribute(attribute_name_index, attribute_length)
+        line_number_table_length = read_unsigned_short
+        line_number_table = []
+        line_number_table_length.times do
+          line_number_table << ::Jvm::Attributes::LineNumberTableItem.new(
+            start_pc: read_unsigned_short,
+            line_number: read_unsigned_short,
+          )
+        end
+
+        ::Jvm::Attributes::LineNumberTable.new(
+          attribute_name_index: attribute_name_index,
+          attribute_length: attribute_length,
+          line_number_table_length: line_number_table_length,
+          line_number_table: line_number_table
+        )
       end
   end
 end

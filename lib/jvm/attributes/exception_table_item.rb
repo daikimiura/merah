@@ -2,7 +2,7 @@
 
 module Jvm
   module Attributes
-    class ExceptionTable
+    class ExceptionTableItem
       attr_reader :start_pc, :end_pc, :handler_pc, :catch_type
 
       def initialize(start_pc:, end_pc:, handler_pc:, catch_type:)
