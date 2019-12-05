@@ -2,5 +2,5 @@
 
 source "https://rubygems.org"
 
-# Specify your gem's dependencies in jarvis.gemspec
+# Specify your gem's dependencies in merah.gemspec
 gemspec

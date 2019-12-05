@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require "jarvis"
+require "merah"
 
 java_class_file = ARGV[0]
-::Jarvis::Runner.new.run(java_class_file)
+::Merah::Runner.new.run(java_class_file)

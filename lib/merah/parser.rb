@@ -1,24 +1,24 @@
 # frozen_string_literal: true
 
-require "jvm/class_file"
-require "jvm/attribute"
-require "jvm/method"
-require "jvm/constant_pool/class"
-require "jvm/constant_pool/fieldref"
-require "jvm/constant_pool/methodref"
-require "jvm/constant_pool/name_and_type"
-require "jvm/constant_pool/string"
-require "jvm/constant_pool/utf8"
-require "jvm/attributes/code"
-require "jvm/attributes/exception_table_item"
-require "jvm/attributes/line_number_table"
-require "jvm/attributes/line_number_table_item"
-require "jvm/attributes/source_file"
+require "merah/class_file/class_file"
+require "merah/class_file/attribute"
+require "merah/class_file/method"
+require "merah/class_file/constant_pool/class"
+require "merah/class_file/constant_pool/fieldref"
+require "merah/class_file/constant_pool/methodref"
+require "merah/class_file/constant_pool/name_and_type"
+require "merah/class_file/constant_pool/string"
+require "merah/class_file/constant_pool/utf8"
+require "merah/class_file/attributes/code"
+require "merah/class_file/attributes/exception_table_item"
+require "merah/class_file/attributes/line_number_table"
+require "merah/class_file/attributes/line_number_table_item"
+require "merah/class_file/attributes/source_file"
 
 require "pry-byebug"
 
-module Jarvis
-  class Reader
+module Merah
+  class Parser
     class ConstantPoolTagNotSupported < StandardError
     end
 
@@ -29,10 +29,10 @@ module Jarvis
 
     def initialize(file_name:)
       @file = File.open(file_name, "rb:ASCII-8BIT")
-      @class_file = ::Jvm::ClassFile.new
+      @class_file = ClassFile::ClassFile.new
     end
 
-    def read
+    def parse
       class_file.magic = file.read(4)
       class_file.minor_version = read_unsigned_short
       class_file.major_version = read_unsigned_short
@@ -77,25 +77,25 @@ module Jarvis
             bytes = []
             length.times { bytes << file.read(1) }
 
-            constant_pool_items << ::Jvm::ConstantPool::Utf8.new(
+            constant_pool_items << ClassFile::ConstantPool::Utf8.new(
               length: length,
               bytes: bytes
             )
           when 7
             name_index = read_unsigned_short
-            constant_pool_items << ::Jvm::ConstantPool::Class.new(
+            constant_pool_items << ClassFile::ConstantPool::Class.new(
               name_index: name_index
             )
           when 8
             string_index = read_unsigned_short
-            constant_pool_items << ::Jvm::ConstantPool::String.new(
+            constant_pool_items << ClassFile::ConstantPool::String.new(
               string_index: string_index
             )
           when 9
             class_index = read_unsigned_short
             name_and_type_index = read_unsigned_short
 
-            constant_pool_items << ::Jvm::ConstantPool::Fieldref.new(
+            constant_pool_items << ClassFile::ConstantPool::Fieldref.new(
               class_index: class_index,
               name_and_type_index: name_and_type_index
             )
@@ -103,7 +103,7 @@ module Jarvis
             class_index = read_unsigned_short
             name_and_type_inedx = read_unsigned_short
 
-            constant_pool_items << ::Jvm::ConstantPool::Methodref.new(
+            constant_pool_items << ClassFile::ConstantPool::Methodref.new(
               class_index: class_index,
               name_and_type_index: name_and_type_inedx
             )
@@ -111,7 +111,7 @@ module Jarvis
             name_index = read_unsigned_short
             descriptor_index = read_unsigned_short
 
-            constant_pool_items << ::Jvm::ConstantPool::NameAndType.new(
+            constant_pool_items << ClassFile::ConstantPool::NameAndType.new(
               name_index: name_index,
               descriptor_index: descriptor_index
             )
@@ -127,7 +127,7 @@ module Jarvis
         methods_count = read_unsigned_short
         methods = []
         methods_count.times do
-          method = ::Jvm::Method.new
+          method = ClassFile::Method.new
           method.access_flags = read_unsigned_short
           method.name_index = read_unsigned_short
           method.descriptor_index = read_unsigned_short
@@ -174,7 +174,7 @@ module Jarvis
         exception_table_length = read_unsigned_short
         exception_table = []
         exception_table_length.times do
-          exception_table << ::Jvm::Attributes::ExceptionTableItem.new(
+          exception_table << ClassFile::Attributes::ExceptionTableItem.new(
             start_pc: read_unsigned_short,
             end_pc: read_unsigned_short,
             handler_pc: read_unsigned_short,
@@ -189,7 +189,7 @@ module Jarvis
           attributes << attribute
         end
 
-        ::Jvm::Attributes::Code.new(
+        ClassFile::Attributes::Code.new(
           attribute_name_index: attribute_name_index,
           attribute_length: attribute_length,
           max_stack: max_stack,
@@ -207,13 +207,13 @@ module Jarvis
         line_number_table_length = read_unsigned_short
         line_number_table = []
         line_number_table_length.times do
-          line_number_table << ::Jvm::Attributes::LineNumberTableItem.new(
+          line_number_table << ClassFile::Attributes::LineNumberTableItem.new(
             start_pc: read_unsigned_short,
             line_number: read_unsigned_short,
           )
         end
 
-        ::Jvm::Attributes::LineNumberTable.new(
+        ClassFile::Attributes::LineNumberTable.new(
           attribute_name_index: attribute_name_index,
           attribute_length: attribute_length,
           line_number_table_length: line_number_table_length,
@@ -223,7 +223,7 @@ module Jarvis
 
       def read_source_file_attribute(attribute_name_index, attribute_length)
         sourcefile_index = read_unsigned_short
-        ::Jvm::Attributes::SourceFile.new(
+        ClassFile::Attributes::SourceFile.new(
           attribute_name_index: attribute_name_index,
           attribute_length: attribute_length,
           sourcefile_index: sourcefile_index

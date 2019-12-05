@@ -2,18 +2,18 @@
 
 lib = File.expand_path("lib", __dir__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require "jarvis/version"
+require "merah/version"
 
 Gem::Specification.new do |spec|
-  spec.name          = "jarvis"
-  spec.version       = Jarvis::VERSION
+  spec.name          = "merah"
+  spec.version       = Merah::VERSION
   spec.authors       = ["daikimiura"]
   spec.email         = ["daikiii5555@gmail.com"]
 
-  spec.summary       = "jarvis is a JVM implementation by ruby"
+  spec.summary       = "merah is a JVM implementation by ruby"
   spec.license       = "MIT"
 
-  spec.metadata["source_code_uri"] = "https://github.com/daikimiura/jarvis"
+  spec.metadata["source_code_uri"] = "https://github.com/daikimiura/merah"
 
   # Specify which files should be added to the gem when it is released.
   # The `git ls-files -z` loads the files in the RubyGem that have been added into git.
