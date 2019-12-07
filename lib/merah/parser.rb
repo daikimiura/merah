@@ -168,8 +168,7 @@ module Merah
         max_locals = read_unsigned_short
 
         code_length = read_unsigned_long
-        code = []
-        code_length.times { code << file.read(1).unpack("C").first }
+        code = file.read(code_length)
 
         exception_table_length = read_unsigned_short
         exception_table = []
