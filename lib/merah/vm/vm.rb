@@ -8,6 +8,9 @@ module Merah
       class MethodNotFound < StandardError
       end
 
+      class CodeNotFound < StandardError
+      end
+
       attr_reader :class_file, :frame_stack
 
       def initialize(class_file:)
@@ -16,12 +19,17 @@ module Merah
       end
 
       def execute
-        binding.pry
         method = search_method(name: "main", type: "([Ljava/lang/String;)V")
-        Frame.new()
+        code_attribute = search_code_attribute(method)
+
+        Frame.new(
+          code_attribute: code_attribute,
+          constant_pool: class_file.constant_pool_items
+        ).execute
       end
 
       private
+
         def constant_pool(index)
           class_file.constant_pool_items[index - 1]
         end
@@ -35,6 +43,15 @@ module Merah
           end
 
           raise MethodNotFound, "name: #{name}, type: #{type}"
+        end
+
+        def search_code_attribute(method)
+          method.attributes.each do |attribute|
+            attribute_name = constant_pool(attribute.attribute_name_index).bytes.join
+            return attribute if attribute_name == 'Code'
+          end
+
+          raise CodeNotFound, "attribute named 'Code' not found."
         end
     end
   end
