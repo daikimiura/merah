@@ -92,7 +92,6 @@ module Merah
 
       def call_instance_method(receiver, method_name, method_type, method_args)
         class_name = receiver.class_name
-        binding.pry
         # klass = fetch_class(class_name)
         if /^java\//.match?(class_name)
           receiver.public_send(method_name, *method_args)

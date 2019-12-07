@@ -11,7 +11,8 @@ module Merah
       MNEMONICS = {
         getstatic: 178,
         ldc: 18,
-        invokevirtual: 182
+        invokevirtual: 182,
+        return: 177
       }
 
       def initialize(vm:, code_attribute:, constant_pool:)
@@ -35,6 +36,8 @@ module Merah
           when MNEMONICS[:invokevirtual]
             operand = read_unsigned_short
             invokevirtual(operand)
+          when MNEMONICS[:return]
+            return
           end
         end
       end
