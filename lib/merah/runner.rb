@@ -7,8 +7,7 @@ module Merah
   class Runner
     def run(file_name)
       class_file = Parser.new(file_name: file_name).parse
-      binding.pry
-      # VM::VM.new(class_file).run
+      VM::VM.new(class_file: class_file).execute
     end
   end
 end
