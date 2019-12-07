@@ -4,4 +4,4 @@
 require "merah"
 
 java_class_file = ARGV[0]
-::Merah::Runner.new.run(java_class_file)
+::Merah::VM::VM.new(entry_file_name: java_class_file).execute

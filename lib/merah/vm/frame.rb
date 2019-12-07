@@ -1,13 +1,12 @@
 # frozen_string_literal: true
-require 'merah/vm/class_loader'
-require 'merah/java/io/print_stream'
-require 'merah/java/lang/system'
-require 'merah/class_file/constant_pool/string'
+
+require "merah/java/io/print_stream"
+require "merah/java/lang/system"
 
 module Merah
   module VM
     class Frame
-      attr_accessor :instructions, :operand_stack, :local_variables, :constant_pool_items, :class_map
+      attr_accessor :vm, :instructions, :operand_stack, :local_variables, :constant_pool_items
 
       MNEMONICS = {
         getstatic: 178,
@@ -15,16 +14,16 @@ module Merah
         invokevirtual: 182
       }
 
-      def initialize(code_attribute:, constant_pool:)
-        @instructions = StringIO.new(code_attribute.code, 'r')
+      def initialize(vm:, code_attribute:, constant_pool:)
+        @vm = vm
+        @instructions = StringIO.new(code_attribute.code, "r")
         @operand_stack = []
         @local_variables = []
         @constant_pool_items = constant_pool
-        @class_map = {}
       end
 
       def execute
-        while (true)
+        while true
           mnemonic = read_unsigned_char
           case mnemonic
           when MNEMONICS[:getstatic]
@@ -41,59 +40,28 @@ module Merah
       end
 
       private
-
         def read_unsigned_char
-          instructions.read(1).unpack('C').first
+          instructions.read(1).unpack("C").first
         end
 
         def read_unsigned_short
-          instructions.read(2).unpack('n').first
+          instructions.read(2).unpack("n").first
         end
 
         def constant_pool(index)
           constant_pool_items[index - 1]
         end
 
-        def fetch_class(class_name)
-          if class_map.has_key?(class_name)
-            class_map(class_name)
-          else
-            initialize_class(class_name)
-          end
-        end
-
-        def initialize_class(class_name)
-          klass = ClassLoader.new.load_class(class_name)
-          value = if /^java\//.match?(class_name)
-                    klass.new
-                  else
-                    # TODO: Implement
-                    raise 'User defined class called'
-                  end
-
-          class_map[class_name] = value
-          value
-        end
-
-        def fetch_field_value(klass, field_name)
-          if klass.is_a?(::Merah::ClassFile::ClassFile)
-            # TODO: Implement
-            raise 'User defined class called'
-          else
-            klass.send(field_name)
-          end
-        end
-
         def getstatic(operand)
           fieldref = constant_pool(operand)
           class_name_index = constant_pool(fieldref.class_index).name_index
           class_name = constant_pool(class_name_index).bytes.join
-          klass = fetch_class(class_name)
+          klass = vm.fetch_class(class_name)
 
           field_name_index = constant_pool(fieldref.name_and_type_index).name_index
           field_name = constant_pool(field_name_index).bytes.join
 
-          operand_stack.push(fetch_field_value(klass, field_name))
+          operand_stack.push(vm.fetch_field_value(klass, field_name))
         end
 
         def ldc(operand)
@@ -105,12 +73,29 @@ module Merah
                   else
                     # TODO: Implement
                     raise "constant pool item type `#{constant_pool_item.class}` not supported"
-                  end
+          end
           operand_stack.push(value)
         end
 
-      def ivokevirtual
-      end
+        def invokevirtual(operand)
+          methodref = constant_pool(operand)
+
+          method_name_index = constant_pool(methodref.name_and_type_index).name_index
+          method_name = constant_pool(method_name_index).bytes.join
+
+          method_type_index = constant_pool(methodref.name_and_type_index).descriptor_index
+          method_type = constant_pool(method_type_index).bytes.join
+
+          arg_num = constant_pool(method_type_index).bytes.count { |i| i == ";" }
+          method_args = []
+          arg_num.times do
+            method_args << operand_stack.pop
+          end
+
+          receiver = operand_stack.pop
+
+          vm.call_instance_method(receiver, method_name, method_type, method_args)
+        end
     end
   end
 end
