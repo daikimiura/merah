@@ -27,6 +27,10 @@ module Merah
         istore_1: 60,
         istore_2: 61,
         istore_3: 62,
+        iload_0: 26,
+        iload_1: 27,
+        iload_2: 28,
+        iload_3: 29,
       }
 
       def initialize(vm:, code_attribute:, constant_pool:, local_variables:)
@@ -76,6 +80,18 @@ module Merah
           when MNEMONICS[:istore_3]
             variable = operand_stack.pop
             local_variables[3] = variable
+          when MNEMONICS[:iload_0]
+            variable = local_variables[0]
+            operand_stack.push(variable)
+          when MNEMONICS[:iload_1]
+            variable = local_variables[1]
+            operand_stack.push(variable)
+          when MNEMONICS[:iload_2]
+            variable = local_variables[2]
+            operand_stack.push(variable)
+          when MNEMONICS[:iload_3]
+            variable = local_variables[3]
+            operand_stack.push(variable)
           when MNEMONICS[:return]
             return
           else
@@ -132,7 +148,8 @@ module Merah
           method_type_index = constant_pool(methodref.name_and_type_index).descriptor_index
           method_type = constant_pool(method_type_index).bytes.join
 
-          arg_num = constant_pool(method_type_index).bytes.count { |i| i == ";" }
+          method_parameter_descriptor = /\((.+)\)/.match(constant_pool(method_type_index).bytes.join)[1]
+          arg_num = vm.tokenize_descriptor(method_parameter_descriptor).size
           method_args = []
           arg_num.times do
             method_args << operand_stack.pop
