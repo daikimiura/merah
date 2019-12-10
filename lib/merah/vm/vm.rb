@@ -28,10 +28,14 @@ module Merah
         method = search_method(class_name: class_name, method_name: "main", method_type: "([Ljava/lang/String;)V")
         code_attribute = search_code_attribute(method)
 
+        local_variables = Array.new(code_attribute.max_locals)
+        local_variables[0] = ''
+
         Frame.new(
           vm: self,
           code_attribute: code_attribute,
-          constant_pool: entry_class_file.constant_pool_items
+          constant_pool: entry_class_file.constant_pool_items,
+          local_variables: local_variables
         ).execute
       end
 

@@ -6,20 +6,34 @@ require "merah/java/lang/system"
 module Merah
   module VM
     class Frame
+      class MnemonicNotImplemented < StandardError
+      end
+
       attr_accessor :vm, :instructions, :operand_stack, :local_variables, :constant_pool_items
 
       MNEMONICS = {
         getstatic: 178,
         ldc: 18,
         invokevirtual: 182,
-        return: 177
+        return: 177,
+        iconst_m1: 2,
+        iconst_0: 3,
+        iconst_1: 4,
+        iconst_2: 5,
+        iconst_3: 6,
+        iconst_4: 7,
+        iconst_5: 8,
+        istore_0: 59,
+        istore_1: 60,
+        istore_2: 61,
+        istore_3: 62,
       }
 
-      def initialize(vm:, code_attribute:, constant_pool:)
+      def initialize(vm:, code_attribute:, constant_pool:, local_variables:)
         @vm = vm
         @instructions = StringIO.new(code_attribute.code, "r")
         @operand_stack = []
-        @local_variables = []
+        @local_variables = local_variables
         @constant_pool_items = constant_pool
       end
 
@@ -36,13 +50,42 @@ module Merah
           when MNEMONICS[:invokevirtual]
             operand = read_unsigned_short
             invokevirtual(operand)
+          when MNEMONICS[:iconst_m1]
+            operand_stack.push(-1)
+          when MNEMONICS[:iconst_0]
+            operand_stack.push(0)
+          when MNEMONICS[:iconst_1]
+            operand_stack.push(1)
+          when MNEMONICS[:iconst_2]
+            operand_stack.push(2)
+          when MNEMONICS[:iconst_3]
+            operand_stack.push(3)
+          when MNEMONICS[:iconst_4]
+            operand_stack.push(4)
+          when MNEMONICS[:iconst_5]
+            operand_stack.push(5)
+          when MNEMONICS[:istore_0]
+            variable = operand_stack.pop
+            local_variables[0] = variable
+          when MNEMONICS[:istore_1]
+            variable = operand_stack.pop
+            local_variables[1] = variable
+          when MNEMONICS[:istore_2]
+            variable = operand_stack.pop
+            local_variables[2] = variable
+          when MNEMONICS[:istore_3]
+            variable = operand_stack.pop
+            local_variables[3] = variable
           when MNEMONICS[:return]
             return
+          else
+            raise MnemonicNotImplemented, "mnemonic: #{mnemonic}"
           end
         end
       end
 
       private
+
         def read_unsigned_char
           instructions.read(1).unpack("C").first
         end
@@ -76,7 +119,7 @@ module Merah
                   else
                     # TODO: Implement
                     raise "constant pool item type `#{constant_pool_item.class}` not supported"
-          end
+                  end
           operand_stack.push(value)
         end
 
