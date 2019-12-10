@@ -40,8 +40,7 @@ module Merah
       class_file.access_flags = read_unsigned_short
       class_file.this_class = read_unsigned_short
       class_file.super_class = read_unsigned_short
-      # In `Hello World` program, the values of `interfaces_count` and `fields_count` are 0,
-      # so currently skip reading `interfaces` and `fields`
+      # TODO: Currently skip reading `interfaces` and `fields`
       class_file.interfaces_count = read_unsigned_short
       class_file.fields_count = read_unsigned_short
       read_methods
