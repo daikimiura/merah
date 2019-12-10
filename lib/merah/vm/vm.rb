@@ -32,7 +32,7 @@ module Merah
         code_attribute = search_code_attribute(method)
 
         local_variables = Array.new(code_attribute.max_locals)
-        local_variables[0] = ''
+        local_variables[0] = ""
 
         Frame.new(
           vm: self,
@@ -111,49 +111,49 @@ module Merah
       def tokenize_descriptor(descriptor)
         desc = descriptor.dup
         tokenized_desc = []
-        array_token = ''
+        array_token = ""
 
-        while desc != ''
+        while desc != ""
           case desc
           when /^B/
-            tokenized_desc << array_token + 'B'
+            tokenized_desc << array_token + "B"
             desc.slice!(0)
-            array_token = ''
+            array_token = ""
           when /^C/
-            tokenized_desc << array_token + 'C'
+            tokenized_desc << array_token + "C"
             desc.slice!(0)
-            array_token = ''
+            array_token = ""
           when /^D/
-            tokenized_desc << array_token + 'D'
+            tokenized_desc << array_token + "D"
             desc.slice!(0)
-            array_token = ''
+            array_token = ""
           when /^F/
-            tokenized_desc << array_token + 'F'
+            tokenized_desc << array_token + "F"
             desc.slice!(0)
-            array_token = ''
+            array_token = ""
           when /^I/
-            tokenized_desc << array_token + 'I'
+            tokenized_desc << array_token + "I"
             desc.slice!(0)
-            array_token = ''
+            array_token = ""
           when /^J/
-            tokenized_desc << array_token + 'J'
+            tokenized_desc << array_token + "J"
             desc.slice!(0)
-            array_token = ''
+            array_token = ""
           when /^S/
-            tokenized_desc << array_token + 'S'
+            tokenized_desc << array_token + "S"
             desc.slice!(0)
-            array_token = ''
+            array_token = ""
           when /^Z/
-            tokenized_desc << array_token + 'Z'
+            tokenized_desc << array_token + "Z"
             desc.slice!(0)
-            array_token = ''
+            array_token = ""
           when /^L.+;/
             type = /^L.+;/.match(desc)[0]
             tokenized_desc << array_token + type
             desc.slice!(0, type.size)
-            array_token = ''
+            array_token = ""
           when /^\[/
-            array_token += '['
+            array_token += "["
             desc.slice!(0)
           else
             raise TypeInvalid, "type: #{descriptor}"

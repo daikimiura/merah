@@ -101,7 +101,6 @@ module Merah
       end
 
       private
-
         def read_unsigned_char
           instructions.read(1).unpack("C").first
         end
@@ -135,7 +134,7 @@ module Merah
                   else
                     # TODO: Implement
                     raise "constant pool item type `#{constant_pool_item.class}` not supported"
-                  end
+          end
           operand_stack.push(value)
         end
 
