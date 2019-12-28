@@ -15,8 +15,6 @@ require "merah/class_file/attributes/line_number_table"
 require "merah/class_file/attributes/line_number_table_item"
 require "merah/class_file/attributes/source_file"
 
-require "pry-byebug"
-
 module Merah
   class Parser
     class ConstantPoolTagNotSupported < StandardError
