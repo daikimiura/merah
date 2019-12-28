@@ -113,7 +113,7 @@ $ (bundle exec) merah <prath/to/your/classfile>
     - [ ] fstore_3
     - [ ] fsub
     - [ ] getfield
-    - [ ] getstatic
+    - [x] getstatic
     - [ ] goto
     - [ ] goto_w
     - [ ] i2b
@@ -127,12 +127,12 @@ $ (bundle exec) merah <prath/to/your/classfile>
     - [ ] iand
     - [ ] iastore
     - [ ] iconst_m1
-    - [ ] iconst_0
-    - [ ] iconst_1
-    - [ ] iconst_2
-    - [ ] iconst_3
-    - [ ] iconst_4
-    - [ ] iconst_5
+    - [x] iconst_0
+    - [x] iconst_1
+    - [x] iconst_2
+    - [x] iconst_3
+    - [x] iconst_4
+    - [x] iconst_5
     - [ ] idiv
     - [ ] if_acmpeq
     - [ ] if_acmpne
@@ -152,10 +152,10 @@ $ (bundle exec) merah <prath/to/your/classfile>
     - [ ] ifnull
     - [ ] iinc
     - [ ] iload
-    - [ ] iload_0
-    - [ ] iload_1
-    - [ ] iload_2
-    - [ ] iload_3
+    - [x] iload_0
+    - [x] iload_1
+    - [x] iload_2
+    - [x] iload_3
     - [ ] impdep1
     - [ ] impdep2
     - [ ] imul
@@ -165,17 +165,17 @@ $ (bundle exec) merah <prath/to/your/classfile>
     - [ ] invokeinterface
     - [ ] invokespecial
     - [ ] invokestatic
-    - [ ] invokevirtual
+    - [x] invokevirtual
     - [ ] ior
     - [ ] irem
     - [ ] ireturn
     - [ ] ishl
     - [ ] ishr
     - [ ] istore
-    - [ ] istore_0
-    - [ ] istore_1
-    - [ ] istore_2
-    - [ ] istore_3
+    - [x] istore_0
+    - [x] istore_1
+    - [x] istore_2
+    - [x] istore_3
     - [ ] isub
     - [ ] iushr
     - [ ] ixor
@@ -191,7 +191,7 @@ $ (bundle exec) merah <prath/to/your/classfile>
     - [ ] lcmp
     - [ ] lconst_0
     - [ ] lconst_1
-    - [ ] ldc
+    - [x] ldc
     - [ ] ldc_w
     - [ ] ldc2_w
     - [ ] ldiv
@@ -227,7 +227,7 @@ $ (bundle exec) merah <prath/to/your/classfile>
     - [ ] putfield
     - [ ] putstatic
     - [ ] ret
-    - [ ] return
+    - [x] return
     - [ ] saload
     - [ ] sastore
     - [ ] sipush
