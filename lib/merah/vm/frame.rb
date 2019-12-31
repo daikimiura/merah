@@ -6,6 +6,8 @@ require "merah/java/lang/system"
 module Merah
   module VM
     class Frame
+      require 'stringio'
+      
       class MnemonicNotImplemented < StandardError
       end
 
